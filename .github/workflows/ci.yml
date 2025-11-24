@@ -3,7 +3,7 @@ name: CI Docker
 on:
   push:
     branches:
-      - chore#8/init-project-structure
+      - dev
   pull_request:
     branches:
       - dev
