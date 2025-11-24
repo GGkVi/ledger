@@ -1,0 +1,30 @@
+name: CI Docker
+
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate CI env file
+        run: |
+          echo "POSTGRES_USER=${{ secrets.DB_USER }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "POSTGRES_DB=${{ secrets.DB_NAME }}" >> .env
+          echo "DJANGO_SETTINGS_MODULE=core.settings" >> .env
+
+      - name: Build Docker services
+        run: docker compose build
+
+      - name: Run tests inside docker
+        run: docker compose run --rm web poetry run python manage.py test
