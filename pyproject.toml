@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "django-mini-be14-main"
+version = "0.1.0"
+description = ""
+authors = ["ducknam3650 <ducknam3650@gamil.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+django = "^5.0"
+gunicorn = "^22.0.0"
+psycopg2-binary = "^2.9.9"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
