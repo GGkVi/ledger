@@ -14,14 +14,17 @@ class Transaction(models.Model):
     type = models.BooleanField(default=False)
     # 입/출금 값
     amount = models.IntegerField(default=0)
+    # null과 blank 공식문서 https://django-orm-cookbook-ko.readthedocs.io/en/latest/null_vs_blank.html
     # 거래내역 분류
     category = models.CharField(
         max_length=8,
+        null=True,
         blank=True,
     )
     # 거래내역 상세메모
     content = models.CharField(
         max_length=64,
+        null=True,
         blank=True,
     )
     # 숨김값 디폴트는 False
