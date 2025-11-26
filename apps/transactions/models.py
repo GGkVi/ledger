@@ -11,7 +11,7 @@ class Transaction(models.Model):
         db_column="account_id",
     )
     # 입/출금 구분용 불리언 값. False가 디폴트값. False=출금
-    type = models.BooleanField(default=False)
+    is_deposit = models.BooleanField(default=False)
     # 입/출금 값
     amount = models.IntegerField(default=0)
     # null과 blank 공식문서 https://django-orm-cookbook-ko.readthedocs.io/en/latest/null_vs_blank.html
