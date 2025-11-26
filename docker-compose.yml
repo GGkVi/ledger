@@ -7,8 +7,8 @@ services:
       dockerfile: docker/Dockerfile
     container_name: django_mini_14
     command: poetry run gunicorn core.wsgi:application --bind 0.0.0.0:8080
-  #  volumes:
-  #    - ..:/app
+    volumes:
+      - .:/app
     ports:
       - "8080:8080"
     environment:
