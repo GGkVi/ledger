@@ -43,7 +43,7 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
-OWN_APPS = ["apps.users", "apps.accounts", "apps.transactions"]
+OWN_APPS = ["apps.users", "apps.accounts", "apps.transactions", "apps.analysis"]
 
 THIRD_PARTY_APPS = [
     "rest_framework",
