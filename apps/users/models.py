@@ -12,26 +12,30 @@ class Role(models.TextChoices):
 
 # 유저 생성 유효성 검사
 class UserManager(BaseUserManager):
-    def create_user(self, email, password):
+    def create_user(self, email, username, password, phone):
         if not email:
             raise ValueError("올바른 이메일을 입력하세요")
 
-        user = self.model(email=self.normalize_email(email))
+        user = self.model(
+            email=self.normalize_email(email),
+            username=username,
+            phone=phone,
+        )
         user.set_password(password)  # 비밀번호 해싱
         user.role = Role.USER  # 유저 권한
         user.is_active = True  # 활성화 상태
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password):
-        user = self.create_user(email, password)
+    def create_superuser(self, email, username, password, phone):
+        user = self.create_user(email, username, password, phone)
         user.role = Role.SUPERUSER
         user.is_active = True
         user.save(using=self._db)
         return user
 
-    def create_admin(self, email, password):
-        user = self.create_user(email, password)
+    def create_admin(self, email, username, password, phone):
+        user = self.create_user(email, username, password, phone)
         user.role = Role.ADMIN
         user.is_active = True
         user.save(using=self._db)
@@ -44,7 +48,7 @@ class User(AbstractBaseUser):
     username = models.CharField(max_length=32)  # 유저 이름 & 닉네임
     password = models.CharField(max_length=255)  # 비밀번호
     phone = models.CharField(max_length=16)  # 전화번호
-    is_active = models.BooleanField(default=False)  # 활성화 상태
+    is_active = models.BooleanField(default=True)  # 활성화 상태
     role = models.CharField(
         max_length=20, choices=Role.choices, default=Role.USER, verbose_name="권한"
     )  # 유저 권한
@@ -54,7 +58,7 @@ class User(AbstractBaseUser):
     objects = UserManager()  # 유저 매니저 설정
     USERNAME_FIELD = "email"  # 식별자 필드
     EMAIL_FIELD = "email"  # 이메일 필드
-    REQUIRED_FIELDS = []  # 필수 필드
+    REQUIRED_FIELDS = ["username", "phone"]  # 필수 필드
 
     class Meta:
         verbose_name = "사용자"
@@ -72,11 +76,25 @@ class User(AbstractBaseUser):
     def __str__(self):
         return self.email
 
+    @property
+    def is_staff(self):
+        return self.role in [Role.ADMIN, Role.SUPERUSER]
+
+    @property
+    def is_superuser(self):
+        return self.role == Role.SUPERUSER
+
     def has_perm(self, perm, obj=None):
         return True
 
     def has_module_perms(self, app_label):
         return True
+
+    def soft_delete(self):
+        self.is_active = False
+        self.save()
+
+    
 
 
 # blacklist token 테이블
