@@ -41,6 +41,7 @@ urlpatterns = [
         name="schema-swagger-ui",
     ),
     path("api/accounts/", include("apps.accounts.urls")),
+    path("api/users/", include("apps.users.urls")),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
