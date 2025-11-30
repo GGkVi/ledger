@@ -32,3 +32,19 @@ class SignUpSerializer(serializers.ModelSerializer):
         user.save()
         return user 
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["email", "username", "phone", "created_at"]
+        read_only_fields = ["email", "created_at"]
+
+    def update(self, instance, validated_data):
+        instance.username = validated_data.get("username", instance.username)
+        instance.phone = validated_data.get("phone", instance.phone)
+        instance.save()
+        return instance 
+        
+    def delete(self, instance):
+        instance.is_active = False
+        instance.save()
+        return instance 

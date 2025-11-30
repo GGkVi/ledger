@@ -102,7 +102,7 @@ class BlacklistToken(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="blacklist_tokens"
     )
-    token = models.CharField(max_length=255)
+    token = models.CharField(max_length=500)
     expires_at = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
 
