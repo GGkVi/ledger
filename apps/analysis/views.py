@@ -1,17 +1,20 @@
-from django.http import Http404, FileResponse
+import matplotlib
+import pandas
+from django.http import FileResponse, Http404
 from rest_framework import generics, status
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.exceptions import ValidationError
-import pandas
-import matplotlib
+
 matplotlib.use('Agg')
+import os
+
 import matplotlib.pyplot as plt
 from django.conf import settings
-import os
-from apps.transactions.models import Transaction
+from serializers import AnalysisCreateSerializer, AnalysisSerializer
+
 from apps.analysis.models import Analysis
-from serializers import AnalysisSerializer, AnalysisCreateSerializer
+from apps.transactions.models import Transaction
 
 """
 1. AnalysisListCreateView
@@ -115,10 +118,10 @@ class AnalysisView(generics.ListAPIView):
             type = False,
             is_hidden = False,
         )
-        
+
         if not transactions.exists():
             raise Http404("Transaction does not exist")
-        
+
         return transactions
 
     # dataframe 생성

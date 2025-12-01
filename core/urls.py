@@ -25,7 +25,7 @@ from rest_framework import permissions
 schema_view = get_schema_view(
     openapi.Info(
         title="API 문서",
-        default_version='v1',
+        default_version="v1",
         description="가계부 서비스 API 문서입니다.",
     ),
     public=True,
