@@ -50,7 +50,10 @@ class User(AbstractBaseUser):
     phone = models.CharField(max_length=16)  # 전화번호
     is_active = models.BooleanField(default=True)  # 활성화 상태
     role = models.CharField(
-        max_length=20, choices=Role.choices, default=Role.USER, verbose_name="권한"
+        max_length=20,
+        choices=Role.choices,
+        default=Role.USER,
+        verbose_name="권한",
     )  # 유저 권한
     created_at = models.DateTimeField(auto_now_add=True)  # 생성된 날짜
     updated_at = models.DateTimeField(auto_now=True)  # 업데이트 날짜
@@ -93,8 +96,6 @@ class User(AbstractBaseUser):
     def soft_delete(self):
         self.is_active = False
         self.save()
-
-    
 
 
 # blacklist token 테이블

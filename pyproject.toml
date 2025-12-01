@@ -17,6 +17,8 @@ djangorestframework = "^3.16.1"
 djangorestframework-simplejwt = "^5.5.1"
 drf-yasg = "^1.21.11"
 pillow = "^12.0.0"
+isort = "^7.0.0"
+black = "^25.11.0"
 
 [build-system]
 requires = ["poetry-core"]
