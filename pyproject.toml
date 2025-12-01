@@ -19,7 +19,18 @@ drf-yasg = "^1.21.11"
 pillow = "^12.0.0"
 isort = "^7.0.0"
 black = "^25.11.0"
+ruff = "^0.14.7"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.black]
+line-length = 88
+
+[tool.ruff]
+line-length = 88

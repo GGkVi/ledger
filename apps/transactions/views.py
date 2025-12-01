@@ -1,10 +1,7 @@
 from datetime import datetime
 
 from rest_framework import permissions, status
-from rest_framework.generics import (
-    ListCreateAPIView,
-    RetrieveUpdateDestroyAPIView,
-)
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 
 from .models import Transaction
