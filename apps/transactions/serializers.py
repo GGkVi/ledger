@@ -4,6 +4,8 @@ from .models import Transaction
 
 
 class TransactionSerializer(serializers.ModelSerializer):
+    account_id = serializers.IntegerField(write_only=True)
+
     class Meta:
         model = Transaction
 
@@ -11,7 +13,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 
         read_only_fields = [
             "id",
-            "account_id",
+            "balance_after",
             "is_hidden",
             "created_at",
             "updated_at",
@@ -19,6 +21,8 @@ class TransactionSerializer(serializers.ModelSerializer):
 
 
 class TransactionDetailSerializer(serializers.ModelSerializer):
+    account_id = serializers.IntegerField(write_only=True)
+
     class Meta:
         model = Transaction
 
@@ -26,6 +30,7 @@ class TransactionDetailSerializer(serializers.ModelSerializer):
 
         read_only_fields = [
             "id",
-            "account_id",
+            "balance_after",
             "created_at",
+            "updated_at",
         ]
