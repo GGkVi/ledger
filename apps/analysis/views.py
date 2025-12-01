@@ -5,13 +5,14 @@ from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 matplotlib.use('Agg')
 import os
 
 import matplotlib.pyplot as plt
 from django.conf import settings
-from serializers import AnalysisCreateSerializer, AnalysisSerializer
+from .serializers import AnalysisCreateSerializer, AnalysisSerializer
 
 from apps.analysis.models import Analysis
 from apps.transactions.models import Transaction
@@ -34,7 +35,8 @@ class AnalysisDetailView(generics.RetrieveUpdateAPIView):
         return Analysis.objects.filter(user=self.request.user)
 
 
-class AnalysisImageDownloadView():
+class AnalysisImageDownloadView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, pk):
         try:
             # Analysis 조회
@@ -71,7 +73,7 @@ AnalysisView (명칭이 이거 아닌거같긴한데 일단은 이걸로)
   - GET : 목록 조회 (get_queryset)
   - POST : 생성
 """
-class AnalysisView(generics.ListAPIView):
+class AnalysisView(generics.ListCreateAPIView):
 
     permission_classes = [IsAuthenticated]
 
@@ -89,7 +91,7 @@ class AnalysisView(generics.ListAPIView):
 
         try:
             # 거래내역 존재 검증
-            transactions = self._transactions(self.request.user, start_date, end_date)
+            transactions = self._transaction_check(self.request.user, start_date, end_date)
 
             # DataFrame 생성
             df = self._create_dataframe(transactions)
@@ -97,12 +99,18 @@ class AnalysisView(generics.ListAPIView):
             # 시각화 + 이미지 저장
             image_path = self._visualize(df, self.request.user, start_date, end_date)
 
+            # 설명 생성
+            description = self._generate_description(df, start_date, end_date)
+
             # Analysis 모델 저장
             serializer.save(
                 user=self.request.user,
                 target='expense',
                 period='custom',
+                period_start=start_date,
+                period_end=end_date,
                 result_image = image_path,
+                description = description,
             )
 
         except Exception as e:
@@ -120,7 +128,7 @@ class AnalysisView(generics.ListAPIView):
         )
 
         if not transactions.exists():
-            raise Http404("Transaction does not exist")
+            raise ValidationError("Transaction does not exist")
 
         return transactions
 
@@ -148,15 +156,15 @@ class AnalysisView(generics.ListAPIView):
 
         fig, axes = plt.subplots(2, 1, figsize = (12, 10))
         fig.suptitle(
-            f'가계부 분석', f'{start_date} to {end_date}',
+            f'가계부 분석', f'({start_date} to {end_date})',
             fontsize = 16
         )
 
         # 상단 - 일별 지출 막대그래프
-        self._plot_daily_bar(axes[0], df)
+        self._chart_daily_bar(axes[0], df)
 
         # 하단 - 카테고리별 파이 차트(구현 되려나)
-        self._plot_category_pie(axes[1], df)
+        self._chart_category_pie(axes[1], df)
 
         plt.tight_layout()
 
@@ -166,15 +174,15 @@ class AnalysisView(generics.ListAPIView):
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
 
         # 이미지 저장(JPEG)
-        plt.savefig(filepath, format='jpeg',dpi=-100,bbox_inches='tight')
+        plt.savefig(filepath, format='jpeg',dpi=100,bbox_inches='tight')
         plt.close()
 
         return filename
 
     # 일별 지출 막대 그래프
     def _chart_daily_bar(self, ax, df):
-        daily = df.groupby(['date']).['amount'].sum().sort_index()
-        dates_str = [daily.index.strftime('%m/%d')]
+        daily = df.groupby('date')['amount'].sum().sort_index()
+        dates_str = [d.strftime('%m/%d') for d in daily.index]
         amounts = daily.values
 
         bars = ax.bar(dates_str, amounts)
@@ -193,12 +201,11 @@ class AnalysisView(generics.ListAPIView):
 
         # 평균선
         average = amounts.mean()
-        ax.axhline(y=average, color='gray', linestyle='--', linewidth=2, label=f'평균: {int(average):,}원'
-        )
+        ax.axhline(y=average, color='gray', linestyle='--', linewidth=2, label=f'평균: {int(average):,}원')
 
     # 기간 동안의 카테고리별 파이 차트
     def _chart_category_pie(self, ax, df):
-        category = df.groupby(['category']).['amount'].sum().sort_values()
+        category = df.groupby('category')['amount'].sum().sort_values(ascending=False)
         # 색상 팔레트
         colors = [
             '#FF6B6B',  # red
@@ -231,11 +238,16 @@ class AnalysisView(generics.ListAPIView):
             fontsize=10,
             fontweight="bold",
         )
+    # 파일명 생성하는 메서드
+    def _generate_filename(self, user, start_date, end_date):
+        timestamp = pandas.Timestamp.now().strftime('%m%d_%H%M%S')
+        return f"analysis/user_{user.id}/{start_date}_{end_date}_{timestamp}.jpeg"
 
+    # 설명 생성하는 메서드
     def _generate_description(self, df, start_date, end_date):
         total = int(df['amount'].sum())
         daily_avg = int(df.groupby('date')['amount'].sum().mean())
-        top_category = df.gorupby('category')['amount'].sum().idxmax()
+        top_category = df.groupby('category')['amount'].sum().idxmax()
 
         return(
             f"FROM {start_date} TO {end_date}\n"
