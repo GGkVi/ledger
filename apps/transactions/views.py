@@ -1,14 +1,13 @@
 from datetime import datetime
 
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import permissions, status
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
-
 from .models import Transaction
-from .serializers import TransactionSerializer, TransactionDetailSerializer
+from .serializers import TransactionDetailSerializer, TransactionSerializer
 
 
 class TransactionListCreateView(ListCreateAPIView):
@@ -83,7 +82,9 @@ class TransactionListCreateView(ListCreateAPIView):
         amount = serializer.validated_data["amount"]
         is_deposit = serializer.validated_data["is_deposit"]
 
-        new_balance = previous_balance + amount if is_deposit else previous_balance - amount
+        new_balance = (
+            previous_balance + amount if is_deposit else previous_balance - amount
+        )
 
         serializer.save(balance_after=new_balance)
 
@@ -150,10 +151,6 @@ class TransactionDetailView(RetrieveUpdateDestroyAPIView):
         self._recalc_after_delete(account, created_at)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-
-
 
     # ------ helper methods ------
 
