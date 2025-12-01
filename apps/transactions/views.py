@@ -1,8 +1,7 @@
 from datetime import datetime
 
-from rest_framework import permissions, status
+from rest_framework import permissions
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework.response import Response
 
 from .models import Transaction
 from .serializers import TransactionDetailSerializer, TransactionSerializer
@@ -17,8 +16,10 @@ class TransactionListCreateView(ListCreateAPIView):
     def get_queryset(self):
         account_id = self.request.query_params.get("account_id")
         return Transaction.objects.filter(
-            is_hidden=False,  # 숨김 제외
-            account_id=account_id,  # 사용자 계정에 속한 거래만
+            # 숨김 제외
+            is_hidden=False,
+            # 사용자 계정에 속한 거래만
+            account_id=account_id,
         ).order_by("-created_at")
 
     # C
@@ -49,41 +50,54 @@ class TransactionDetailView(RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         account_id = self.request.query_params.get("account_id")
+        # 사용자 계정에 속한 거래만 조회
         return Transaction.objects.filter(
-            account_id=account_id,  # 사용자 계정에 속한 거래만
+            account_id=account_id,
         ).order_by("-created_at")
 
     def update(self, request, *args, **kwargs):
+        # 값 입력받음
         instance = self.get_object()
-
+        # 수정할 계좌 아이디 최근 거래내역 불러오기
+        account_id = self.request.data.get("account_id")
+        last_transaction = (
+            Transaction.objects.filter(account_id=account_id)
+            .order_by("-created_at")
+            .first()
+        )
+        # 값,이후 잔액
+        previous_amount = last_transaction.amount
+        previous_balance_after = last_transaction.balance_after
+        # 값 반전
+        previous_amount = -previous_amount
+        # 요청값 불러오기
+        is_deposit = request.data.get("is_deposit")
+        amount = request.data.get("amount")
         category = request.data.get("category", None)
         content = request.data.get("content", None)
-        is_hidden = request.data.get("is_hidden", None)
         updated_at = datetime.now()
-
+        # 출금이면 금액 음수로 바꾸기
+        if not is_deposit:
+            amount = -amount
+        # 잔액 계산
+        balance_after = previous_balance_after + previous_amount + amount
+        # 인스턴스에 값 집어넣기
+        if is_deposit is not None:
+            instance.is_deposit = is_deposit
+        if amount is not None:
+            instance.amount = amount
+        if balance_after is not None:
+            instance.balance_after = balance_after
         if category is not None:
             instance.category = category
         if content is not None:
             instance.content = content
-        if is_hidden is not None:
-            instance.is_hidden = is_hidden
         instance.updated_at = updated_at
 
         instance.save()
 
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
     def delete(self, request, *args, **kwargs):
-        instance = self.get_object()  # 삭제할 대상 가져오기
-        instance.delete()
-
-        amount = instance.amount
-        is_deposit = instance.is_deposit
-        if not is_deposit:
-            amount = -amount
-        balance_after = instance.balance_after + amount
-
-        instance.save(balance_after=balance_after)
-
-        return Response({"message": "삭제되었습니다."})
+        # 삭제할 값 숨김처리(소프트 삭제)
+        instance = self.get_object()
+        instance.is_hidden = True
+        instance.save()

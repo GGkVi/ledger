@@ -11,6 +11,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 
         read_only_fields = [
             "id",
+            "account_id",
             "is_hidden",
             "created_at",
             "updated_at",
@@ -26,8 +27,6 @@ class TransactionDetailSerializer(serializers.ModelSerializer):
         read_only_fields = [
             "id",
             "account_id",
-            "is_deposit",
-            "amount",
-            "balance_after",
+            "is_hidden",
             "created_at",
         ]
