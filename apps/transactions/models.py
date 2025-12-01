@@ -15,6 +15,7 @@ class Transaction(models.Model):
     # 입/출금 값
     amount = models.IntegerField(default=0)
     # null과 blank 공식문서 https://django-orm-cookbook-ko.readthedocs.io/en/latest/null_vs_blank.html
+    balance_after = models.IntegerField(default=0)
     # 거래내역 분류
     category = models.CharField(
         max_length=8,
