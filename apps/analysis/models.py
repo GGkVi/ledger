@@ -18,6 +18,7 @@ class Periods(models.TextChoices):
 
 class Analysis(models.Model):
 
+class Analysis(models.Model):
     # id 비선언 → 자동생성
     # 유저id FK 받아오기
     user = models.ForeignKey(
