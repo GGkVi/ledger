@@ -1,30 +1,30 @@
 # from django.shortcuts import render
-from drf_yasg.utils import swagger_auto_schema
-from rest_framework.generics import CreateAPIView
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework import status, permissions
-from rest_framework_simplejwt.tokens import RefreshToken
-
-from django.contrib.auth import authenticate
 from datetime import datetime
 
-from .serializers import SignUpSerializer, UserSerializer, LoginSerializer
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import permissions, status
+from rest_framework.generics import CreateAPIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+
 from .models import BlacklistToken
+from .serializers import SignUpSerializer, UserSerializer
 
 
-# 회원가입 
+# 회원가입
 class SignUpAPIView(CreateAPIView):
     serializer_class = SignUpSerializer
-    permission_classes = [permissions.AllowAny] # 모든 사용자 접근 허용
-    authentication_classes = [] 
+    permission_classes = [permissions.AllowAny]  # 모든 사용자 접근 허용
+    authentication_classes = []
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 # 로그아웃
 class LogoutAPIView(APIView):
@@ -57,14 +57,16 @@ class LogoutAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+
 # 유저 조회
 class UserProfileAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, *args, **kwargs): # 유저 프로필 조회
+    def get(self, request, *args, **kwargs):  # 유저 프로필 조회
         serializer = UserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
+
 # 유저 수정
 class UserProfileUpdateAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -77,6 +79,7 @@ class UserProfileUpdateAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 # 유저 삭제
 class UserProfileDeleteAPIView(APIView):

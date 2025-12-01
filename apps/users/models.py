@@ -94,8 +94,6 @@ class User(AbstractBaseUser):
         self.is_active = False
         self.save()
 
-    
-
 
 # blacklist token 테이블
 class BlacklistToken(models.Model):

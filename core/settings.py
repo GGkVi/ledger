@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -148,26 +149,24 @@ REST_FRAMEWORK = {
     ],
 }
 
-from datetime import timedelta
-
 SIMPLE_JWT = {
     "TOKEN_OBTAIN_SERIALIZER": "apps.users.jwt_serializers.MyTokenObtainPairSerializer",
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": True,
-    'TOKEN_USER_CLASS': 'apps.users.models.User',
+    "TOKEN_USER_CLASS": "apps.users.models.User",
 }
 
 # swagger 문서 세팅
 SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-        'Bearer': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header',
-            'description': 'JWT 인증을 위해 다음과 같이 입력하세요: Bearer <토큰>',
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT 인증을 위해 다음과 같이 입력하세요: Bearer <토큰>",
         }
     },
-    'USE_SESSION_AUTH': False,  # Basic Auth 숨김
+    "USE_SESSION_AUTH": False,  # Basic Auth 숨김
 }

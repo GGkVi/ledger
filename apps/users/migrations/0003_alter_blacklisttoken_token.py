@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0002_alter_user_is_active'),
+        ("users", "0002_alter_user_is_active"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='blacklisttoken',
-            name='token',
+            model_name="blacklisttoken",
+            name="token",
             field=models.CharField(max_length=500),
         ),
     ]

@@ -1,9 +1,10 @@
 from django.urls import reverse
-from rest_framework.test import APITestCase
 from rest_framework import status
-from apps.users.models import User
-from apps.accounts.models import Accounts, BankCodes
+from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
+
+from apps.accounts.models import Accounts, BankCodes
+from apps.users.models import User
 
 
 class AccountsAPITest(APITestCase):
@@ -61,12 +62,16 @@ class AccountsAPITest(APITestCase):
         """
         # 테스트용 계좌 생성 (2개)
         Accounts.objects.create(
-            user=self.user, bank_code=self.bank,
-            account_number="00-1111", account_purpose="저축"
+            user=self.user,
+            bank_code=self.bank,
+            account_number="00-1111",
+            account_purpose="저축",
         )
         Accounts.objects.create(
-            user=self.user, bank_code=self.bank,
-            account_number="00-2222", account_purpose="생활비"
+            user=self.user,
+            bank_code=self.bank,
+            account_number="00-2222",
+            account_purpose="생활비",
         )
 
         response = self.client.get(self.list_url)
@@ -79,8 +84,10 @@ class AccountsAPITest(APITestCase):
         GET: 단일 계좌 조회
         """
         acc = Accounts.objects.create(
-            user=self.user, bank_code=self.bank,
-            account_number="12-3456", account_purpose="월세"
+            user=self.user,
+            bank_code=self.bank,
+            account_number="12-3456",
+            account_purpose="월세",
         )
 
         url = reverse("account-detail", kwargs={"pk": acc.id})
@@ -94,8 +101,10 @@ class AccountsAPITest(APITestCase):
         PUT: 수정 불가 확인
         """
         acc = Accounts.objects.create(
-            user=self.user, bank_code=self.bank,
-            account_number="77-8888", account_purpose="여행"
+            user=self.user,
+            bank_code=self.bank,
+            account_number="77-8888",
+            account_purpose="여행",
         )
 
         url = reverse("account-detail", kwargs={"pk": acc.id})
@@ -114,8 +123,10 @@ class AccountsAPITest(APITestCase):
         PATCH: 부분 수정 불가 확인
         """
         acc = Accounts.objects.create(
-            user=self.user, bank_code=self.bank,
-            account_number="12-9999", account_purpose="기타"
+            user=self.user,
+            bank_code=self.bank,
+            account_number="12-9999",
+            account_purpose="기타",
         )
 
         url = reverse("account-detail", kwargs={"pk": acc.id})
@@ -128,8 +139,10 @@ class AccountsAPITest(APITestCase):
         DELETE: 계좌 삭제
         """
         acc = Accounts.objects.create(
-            user=self.user, bank_code=self.bank,
-            account_number="22-3333", account_purpose="비상금"
+            user=self.user,
+            bank_code=self.bank,
+            account_number="22-3333",
+            account_purpose="비상금",
         )
 
         url = reverse("account-detail", kwargs={"pk": acc.id})
