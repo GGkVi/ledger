@@ -27,6 +27,5 @@ class TransactionDetailSerializer(serializers.ModelSerializer):
         read_only_fields = [
             "id",
             "account_id",
-            "is_hidden",
             "created_at",
         ]
