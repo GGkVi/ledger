@@ -7,6 +7,7 @@ import apps.analysis.utils
 
 
 class Migration(migrations.Migration):
+
     initial = True
 
     dependencies = [
@@ -88,8 +89,7 @@ class Migration(migrations.Migration):
                         name="idx_user_target_period",
                     ),
                     models.Index(
-                        fields=["period_start", "period_end"],
-                        name="idx_period_range",
+                        fields=["period_start", "period_end"], name="idx_period_range"
                     ),
                     models.Index(fields=["-created_at"], name="idx_created_desc"),
                 ],

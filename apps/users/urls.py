@@ -18,14 +18,10 @@ urlpatterns = [
     path("logout/", LogoutAPIView.as_view(), name="logout"),  # 로그아웃
     path("profile/", UserProfileAPIView.as_view(), name="profile"),  # 유저 조회
     path(
-        "profile/update/",
-        UserProfileUpdateAPIView.as_view(),
-        name="profile-update",
+        "profile/update/", UserProfileUpdateAPIView.as_view(), name="profile-update"
     ),  # 유저 수정
     path(
-        "profile/delete/",
-        UserProfileDeleteAPIView.as_view(),
-        name="profile-delete",
+        "profile/delete/", UserProfileDeleteAPIView.as_view(), name="profile-delete"
     ),  # 유저 삭제
     # jwt views
     path("token/", TokenObtainPairView.as_view(), name="login"),  # 로그인

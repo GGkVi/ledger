@@ -17,6 +17,8 @@ class Periods(models.TextChoices):
 
 
 class Analysis(models.Model):
+
+class Analysis(models.Model):
     # id 비선언 → 자동생성
     # 유저id FK 받아오기
     user = models.ForeignKey(
@@ -95,8 +97,7 @@ class Analysis(models.Model):
 
         indexes = [
             models.Index(
-                fields=["user", "target", "period"],
-                name="idx_user_target_period",
+                fields=["user", "target", "period"], name="idx_user_target_period"
             ),
             models.Index(
                 fields=["period_start", "period_end"], name="idx_period_range"
