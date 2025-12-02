@@ -6,6 +6,7 @@ from django.db import models
 class Targets(models.TextChoices):
     EXPENSE = "expense", "총 지출"
     INCOME = "income", "총 수입"
+    ALL = "all", "전체"
 
 
 # Periods: 분석 단위(기간). 커스텀 기간 추가도 생각해 볼 것
@@ -37,6 +38,8 @@ class Analysis(models.Model):
     period = models.CharField(
         max_length=10,
         choices=Periods.choices,
+        null=True,
+        blank=True,
         verbose_name="분석 단위",
         db_index=True,
     )
@@ -46,18 +49,17 @@ class Analysis(models.Model):
 
     # 분석 결과 설명
     description = models.TextField(
-        verbose_name="분석 요약",
-        blank=True,
         null=True,
-        help_text="분석 메모나 요약을 입력하세요.",
+        blank=True,
+        verbose_name="분석 요약",
     )
 
-    # 이미지파일 생성 후 저장 경로 urls로
-    result_image = models.CharField(
-        max_length=255,
-        verbose_name="분석 그래프 경로",
-        blank=True,
+    # 분석 이미지 파일 경로
+    result_image = models.ImageField(
+        upload_to="analysis/",
         null=True,
+        blank=True,
+        verbose_name="분석 그래프",
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -73,12 +75,12 @@ class Analysis(models.Model):
                 )
 
     def save(self, *args, **kwargs):
-        self.full_clean()  # 메서드 자동 호출
-        super().save(*args, **kwargs)
+        self.full_clean()
+        return super().save(*args, **kwargs)
 
     # ordering은 정렬 순서 지정. -앞에 붙이면 내림차순 = 최신순으로 정렬해 줌
     def __str__(self):
-        return f"[{self.user.username}] {self.target} - {self.period} ({self.period_start} ~ {self.period_end})"
+        return f"[{self.user.username}] {self.target} ({self.period or 'manual'})"
 
     class Meta:
         db_table = "analysis"
@@ -86,24 +88,3 @@ class Analysis(models.Model):
         verbose_name_plural = "가계부 분석 목록"
 
         ordering = ["-created_at"]
-
-        # 인덱스
-
-        indexes = [
-            models.Index(
-                fields=["user", "target", "period"], name="idx_user_target_period"
-            ),
-            models.Index(
-                fields=["period_start", "period_end"], name="idx_period_range"
-            ),
-            models.Index(fields=["-created_at"], name="idx_created_desc"),
-        ]
-        # lesser than, equal 에서 equal 빼도 되지 않나? 단위기간이 month, weekly면? 아니면 1일차만 할 거면 8/8 ~ 8/8 해야하나?
-        # 제약사항 이렇게 만들면 validateError 안해도 되지 않나?
-
-        constraints = [
-            models.CheckConstraint(
-                check=models.Q(period_start__lte=models.F("period_end")),
-                name="check_period_validity",
-            )
-        ]

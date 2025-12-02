@@ -56,6 +56,8 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "drf_yasg",
+    "django_celery_beat",
+    "django_celery_results",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + OWN_APPS + THIRD_PARTY_APPS
@@ -140,6 +142,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -177,6 +181,9 @@ SWAGGER_SETTINGS = {
     "USE_SESSION_AUTH": False,  # Basic Auth 숨김
 }
 
-# Media URL (이미지 출력용)
-MEDIA_ROOT = BASE_DIR / "media"
-MEDIA_URL = "/media/"
+# Celery Settings
+CELERY_BROKER_URL = "redis://redis:6379/0"
+CELERY_RESULT_BACKEND = "redis://redis:6379/1"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"

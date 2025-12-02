@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Analysis
+from .models import Analysis, Targets
 
 
 class AnalysisSerializer(serializers.ModelSerializer):
@@ -11,6 +11,8 @@ class AnalysisSerializer(serializers.ModelSerializer):
         model = Analysis
         fields = [
             "id",
+            "target",
+            "period",
             "period_start",
             "period_end",
             "description",
@@ -36,7 +38,12 @@ class AnalysisSerializer(serializers.ModelSerializer):
 
 class AnalysisCreateSerializer(serializers.Serializer):
     start_date = serializers.DateField(help_text="시작일: YYYY-MM-DD")
-    end_date = serializers.DateField(help_text="종료일: YYYY-MM-DD")
+    end_date = serializers.DateField(help_text="종료일: YYYYY-MM-DD")
+    target = serializers.ChoiceField(
+        choices=Targets.choices,
+        default=Targets.ALL,
+        help_text="expense / income / all",
+    )
 
     def validate(self, data):
         if data["start_date"] > data["end_date"]:

@@ -2,7 +2,11 @@ FROM python:3.13-slim-bookworm
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y gcc libpq-dev libyaml-dev && rm -rf /var/lib/apt/lists/*
+# 시스템 패키지 + 한글폰트 + fontconfig 설치(슬림버전이라서)
+RUN apt-get update && \
+    apt-get install -y gcc libpq-dev libyaml-dev fontconfig fonts-nanum && \
+    fc-cache -fv && \
+    rm -rf /var/lib/apt/lists/*
 
 # Poetry 설치 캐시 사용 안함
 RUN pip install --no-cache-dir poetry
