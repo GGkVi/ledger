@@ -17,6 +17,27 @@ from .serializers import AnalysisCreateSerializer, AnalysisSerializer
 from apps.analysis.models import Analysis
 from apps.transactions.models import Transaction
 
+import matplotlib.font_manager as font_manager
+
+# 한글 테스트용 폰트 설정
+try:
+    # 폰트 지정
+    font_list = ['NanumGothic', 'NanumBarunGothic', 'Malgun Gothic', 'AppleGothic']
+    available_fonts = [f.name for f in font_manager.fontManager.ttflist]
+
+    for font_name in font_list:
+        if font_name in available_fonts:
+            plt.rcParams['font.family'] = font_name
+            break
+    else:
+        print("Warning: Korean font not found. Korean characters may not display correctly.")
+        plt.rcParams['font.family'] = 'DejaVu Sans'
+
+    # 마이너스는 수정
+    plt.rcParams['axes.unicode_minus'] = False
+except Exception as e:
+    print(f"Font configuration warning: {e}")
+
 """
 1. AnalysisListCreateView
   - GET : 목록 조회
@@ -27,13 +48,12 @@ from apps.transactions.models import Transaction
   - GET : 파일 다운로드
 """
 
-class AnalysisDetailView(generics.RetrieveUpdateAPIView):
+class AnalysisDetailView(generics.RetrieveAPIView):
     serializer_class = AnalysisSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Analysis.objects.filter(user=self.request.user)
-
 
 class AnalysisImageDownloadView(APIView):
     permission_classes = [IsAuthenticated]
@@ -89,41 +109,37 @@ class AnalysisView(generics.ListCreateAPIView):
         start_date = serializer.validated_data['start_date']
         end_date = serializer.validated_data['end_date']
 
-        try:
-            # 거래내역 존재 검증
-            transactions = self._transaction_check(self.request.user, start_date, end_date)
 
-            # DataFrame 생성
-            df = self._create_dataframe(transactions)
+        # 거래내역 존재 검증
+        transactions = self._transaction_check(self.request.user, start_date, end_date)
 
-            # 시각화 + 이미지 저장
-            image_path = self._visualize(df, self.request.user, start_date, end_date)
+        # DataFrame 생성
+        df = self._create_dataframe(transactions)
 
-            # 설명 생성
-            description = self._generate_description(df, start_date, end_date)
+        # 시각화 + 이미지 저장
+        image_path = self._visualize(df, self.request.user, start_date, end_date)
 
-            # Analysis 모델 저장
-            serializer.save(
-                user=self.request.user,
-                target='expense',
-                period='custom',
-                period_start=start_date,
-                period_end=end_date,
-                result_image = image_path,
-                description = description,
-            )
+        # 설명 생성
+        description = self._generate_description(df, start_date, end_date)
 
-        except Exception as e:
-            print(f"Error occurred in perform_create: {e}")
+        # Analysis 모델 저장
+        serializer.save(
+            user=self.request.user,
+            target='expense',
+            period='custom',
+            period_start=start_date,
+            period_end=end_date,
+            result_image = image_path,
+            description = description,
+        )
 
-
-    # 거래내역 조회해 주는 메서드, type False: 지출만. is_hidden이 아닌 것만.
+    # 거래내역 조회해 주는 메서드, 구type 현is_deposit False: 지출만. is_hidden이 아닌 것만.
     def _transaction_check(self, user, start_date, end_date):
         transactions = Transaction.objects.filter(
             account_id__user=user,
             created_at__date__gte=start_date,
             created_at__date__lte=end_date,
-            type = False,
+            is_deposit = False,
             is_hidden = False,
         )
 
@@ -156,7 +172,7 @@ class AnalysisView(generics.ListCreateAPIView):
 
         fig, axes = plt.subplots(2, 1, figsize = (12, 10))
         fig.suptitle(
-            f'가계부 분석', f'({start_date} to {end_date})',
+            f'가계부 분석 ({start_date} to {end_date})',
             fontsize = 16
         )
 
