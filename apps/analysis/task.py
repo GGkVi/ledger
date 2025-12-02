@@ -1,9 +1,10 @@
 from datetime import date, timedelta
+
 from celery import shared_task
 from django.contrib.auth import get_user_model
 
 from .analyzers import Analyzer
-from .models import Targets, Periods
+from .models import Periods, Targets
 
 User = get_user_model()
 
