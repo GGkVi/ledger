@@ -178,5 +178,5 @@ SWAGGER_SETTINGS = {
 }
 
 # Media URL (이미지 출력용)
-MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = "/media/"
