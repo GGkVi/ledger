@@ -49,7 +49,7 @@ OWN_APPS = [
     "apps.accounts",
     "apps.transactions",
     "apps.analysis",
-    "apps.notifications",
+    "apps.notifications.apps.NotificationsConfig",
 ]
 
 THIRD_PARTY_APPS = [
