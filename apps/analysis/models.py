@@ -52,12 +52,10 @@ class Analysis(models.Model):
         help_text="분석 메모나 요약을 입력하세요.",
     )
 
-    # 이미지파일 생성 후 저장 경로
-    # %Y/%m으로 연도/월/ 디렉터리에 저장될 수 있게
-    # upload_to = get_analysis_image_path 식으로 함수에서 받을 수 있게 한다면?
-    result_image = models.ImageField(
-        upload_to='analysis/',
-        verbose_name="분석 그래프",
+    # 이미지파일 생성 후 저장 경로 urls로
+    result_image = models.CharField(
+        max_length=255,
+        verbose_name="분석 그래프 경로",
         blank=True,
         null=True,
     )
