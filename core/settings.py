@@ -176,3 +176,7 @@ SWAGGER_SETTINGS = {
     },
     "USE_SESSION_AUTH": False,  # Basic Auth 숨김
 }
+
+# Media URL (이미지 출력용)
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
