@@ -94,20 +94,21 @@ AnalysisView (명칭이 이거 아닌거같긴한데 일단은 이걸로)
   - POST : 생성
 """
 class AnalysisView(generics.ListCreateAPIView):
-
     permission_classes = [IsAuthenticated]
-
-    def get_serializer_class(self):
-        if self.request.method == 'POST':
-            return AnalysisCreateSerializer
-        return AnalysisSerializer
 
     def get_queryset(self):
         return Analysis.objects.filter(user=self.request.user).order_by('-created_at')
 
-    def perform_create(self, serializer):
-        start_date = serializer.validated_data['start_date']
-        end_date = serializer.validated_data['end_date']
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return AnalysisSerializer
+        return AnalysisCreateSerializer
+
+    def create(self, request, *args, **kwargs):
+        input_serializer = AnalysisCreateSerializer(data=request.data)
+        input_serializer.is_valid(raise_exception=True)
+        start_date = input_serializer.validated_data['start_date']
+        end_date = input_serializer.validated_data['end_date']
 
         # 거래내역 존재 검증
         transactions = self._transaction_check(self.request.user, start_date, end_date)
@@ -121,16 +122,21 @@ class AnalysisView(generics.ListCreateAPIView):
         # 설명 생성
         description = self._generate_description(df, start_date, end_date)
 
-        # Analysis 모델 저장
-        serializer.save(
-            user=self.request.user,
+        period = self._get_period(start_date, end_date)
+
+        # Analysis 모델 생성
+        analysis = Analysis.objects.create(
+            user=request.user,
             target='expense',
-            period='custom',
+            period=period,
             period_start=start_date,
             period_end=end_date,
             result_image = image_path,
             description = description,
         )
+
+        output = AnalysisSerializer(analysis, context = {'request': request})
+        return Response(output.data, status = status.HTTP_201_CREATED)
 
     # 거래내역 조회해 주는 메서드, 구type 현is_deposit False: 지출만. is_hidden이 아닌 것만.
     def _transaction_check(self, user, start_date, end_date):
@@ -251,6 +257,12 @@ class AnalysisView(generics.ListCreateAPIView):
             loc='center left',
             fontsize=10,
         )
+
+    # choices 맞춰서 weekly/monthly 구현
+    def _get_period(self, start_date, end_date):
+        days = (end_date - start_date).days + 1
+        return "weekly" if days <= 7 else "monthly"
+    
     # 파일명 생성하는 메서드
     def _generate_filename(self, user, start_date, end_date):
         timestamp = pandas.Timestamp.now().strftime('%m%d_%H%M%S')
