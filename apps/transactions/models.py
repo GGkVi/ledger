@@ -13,8 +13,9 @@ class Transaction(models.Model):
     # 입/출금 구분용 불리언 값. False가 디폴트값. False=출금
     is_deposit = models.BooleanField(default=False)
     # 입/출금 값
-    amount = models.IntegerField(default=0)
+    amount = models.BigIntegerField(default=0)
     # null과 blank 공식문서 https://django-orm-cookbook-ko.readthedocs.io/en/latest/null_vs_blank.html
+    balance_after = models.BigIntegerField(default=0)
     # 거래내역 분류
     category = models.CharField(
         max_length=8,
