@@ -23,6 +23,12 @@ class TransactionListCreateView(ListCreateAPIView):
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
+                "account_id",
+                openapi.IN_QUERY,
+                description="검색 계좌",
+                type=openapi.TYPE_INTEGER,
+            ),
+            openapi.Parameter(
                 "is_deposit",
                 openapi.IN_QUERY,
                 description="입금 여부 (true=입금 / false=출금)",
@@ -40,6 +46,14 @@ class TransactionListCreateView(ListCreateAPIView):
                 description="최대 금액",
                 type=openapi.TYPE_INTEGER,
             ),
+            openapi.Parameter(
+                "sort_order",
+                openapi.IN_QUERY,
+                description="정렬",
+                type=openapi.TYPE_STRING,
+                enum=["-created_at", "created_at", "-updated_at", "updated_at"],
+                default="-created_at",
+            ),
         ],
         operation_description="로그인한 사용자의 모든 거래 조회",
     )
@@ -49,14 +63,27 @@ class TransactionListCreateView(ListCreateAPIView):
     def get_queryset(self):
         user = self.request.user
 
-        qs = Transaction.objects.filter(
-            is_hidden=False,
-            account_id__user=user,
-        ).order_by("-created_at")
+        sort_order = self.request.query_params.get("sort_order")
 
+        if sort_order:
+            qs = Transaction.objects.filter(
+                is_hidden=False,
+                account_id__user=user,
+            ).order_by(sort_order)
+        else:
+            qs = Transaction.objects.filter(
+                is_hidden=False,
+                account_id__user=user,
+            ).order_by("created_at")
+
+        account_id = self.request.query_params.get("account_id")
         is_deposit = self.request.query_params.get("is_deposit")
         min_amount = self.request.query_params.get("min_amount")
         max_amount = self.request.query_params.get("max_amount")
+
+
+        if account_id:
+            qs = qs.filter(account_id=account_id)
 
         if is_deposit in ("true", "false"):
             qs = qs.filter(is_deposit=(is_deposit == "true"))
