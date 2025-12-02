@@ -46,6 +46,7 @@ urlpatterns = [
     path("api/users/", include("apps.users.urls")),
     path("api/transactions/", include("apps.transactions.urls")),
     path("api/analysis/", include("apps.analysis.urls")),
+    path("api/notifications/", include("apps.notifications.urls")),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

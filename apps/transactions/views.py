@@ -81,7 +81,6 @@ class TransactionListCreateView(ListCreateAPIView):
         min_amount = self.request.query_params.get("min_amount")
         max_amount = self.request.query_params.get("max_amount")
 
-
         if account_id:
             qs = qs.filter(account_id=account_id)
 
