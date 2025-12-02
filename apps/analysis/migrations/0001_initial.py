@@ -16,16 +16,65 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Analysis",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('target', models.CharField(choices=[('expense', '총 지출'), ('income', '총 수입')], db_index=True, max_length=10, verbose_name='분석 대상')),
-                ('period', models.CharField(choices=[('weekly', '주간'), ('monthly', '월간')], db_index=True, max_length=10, verbose_name='분석 단위')),
-                ('period_start', models.DateField(verbose_name='분석 시작일')),
-                ('period_end', models.DateField(verbose_name='분석 종료일')),
-                ('description', models.TextField(blank=True, help_text='분석 메모나 요약을 입력하세요.', null=True, verbose_name='분석 요약')),
-                ('result_image', models.ImageField(blank=True, null=True, upload_to='analysis/', verbose_name='분석 그래프')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('user', models.ForeignKey(db_column='user_id', on_delete=django.db.models.deletion.CASCADE, related_name='analyses', to='users.user', verbose_name='사용자')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "target",
+                    models.CharField(
+                        choices=[("expense", "총 지출"), ("income", "총 수입")],
+                        db_index=True,
+                        max_length=10,
+                        verbose_name="분석 대상",
+                    ),
+                ),
+                (
+                    "period",
+                    models.CharField(
+                        choices=[("weekly", "주간"), ("monthly", "월간")],
+                        db_index=True,
+                        max_length=10,
+                        verbose_name="분석 단위",
+                    ),
+                ),
+                ("period_start", models.DateField(verbose_name="분석 시작일")),
+                ("period_end", models.DateField(verbose_name="분석 종료일")),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="분석 메모나 요약을 입력하세요.",
+                        null=True,
+                        verbose_name="분석 요약",
+                    ),
+                ),
+                (
+                    "result_image",
+                    models.ImageField(
+                        blank=True,
+                        null=True,
+                        upload_to="analysis/",
+                        verbose_name="분석 그래프",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        db_column="user_id",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="analyses",
+                        to="users.user",
+                        verbose_name="사용자",
+                    ),
+                ),
             ],
             options={
                 "verbose_name": "가계부 분석",

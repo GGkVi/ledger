@@ -1,21 +1,26 @@
-from rest_framework import generics, status
+import os
+
+from django.conf import settings
+from django.http import FileResponse, Http404
+from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.http import FileResponse, Http404
-from django.conf import settings
-import os
 
-from .serializers import AnalysisCreateSerializer, AnalysisSerializer
 from .analyzers import Analyzer
 from .models import Analysis
+from .serializers import AnalysisCreateSerializer, AnalysisSerializer
 
 
 class AnalysisView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
-        return AnalysisCreateSerializer if self.request.method == "POST" else AnalysisSerializer
+        return (
+            AnalysisCreateSerializer
+            if self.request.method == "POST"
+            else AnalysisSerializer
+        )
 
     def get_queryset(self):
         return Analysis.objects.filter(user=self.request.user).order_by("-created_at")

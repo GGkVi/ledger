@@ -1,15 +1,15 @@
 import os
-import pandas as pd
+
 import matplotlib
+import pandas as pd
+
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import matplotlib.font_manager as font_manager
-
-from django.db.models import Sum
+import matplotlib.pyplot as plt
 from django.conf import settings
-from apps.transactions.models import Transaction
-from apps.analysis.models import Analysis
 
+from apps.analysis.models import Analysis
+from apps.transactions.models import Transaction
 
 # 한글 폰트 설정
 font_candidates = ["NanumGothic", "NanumBarunGothic", "Malgun Gothic", "AppleGothic"]
@@ -33,8 +33,6 @@ class Analyzer:
         self.target = target
         self.period = period
 
-
-
     # 1. 거래 조회
     def _get_transactions(self):
         qs = Transaction.objects.filter(
@@ -57,26 +55,21 @@ class Analyzer:
 
         return qs
 
-
-
-
-
     # 2. 데이터프레임 생성
     def _df(self, qs):
-        df = pd.DataFrame(list(qs.values("amount", "is_deposit", "category", "created_at")))
+        df = pd.DataFrame(
+            list(qs.values("amount", "is_deposit", "category", "created_at"))
+        )
 
         df["date"] = pd.to_datetime(df["created_at"]).dt.date
         df["category"] = df["category"].fillna("기타")
 
-        # 🔥 signed_amount: 입금(+) / 출금(-)
+        # signed_amount: 입금(+) / 출금(-)
         df["signed_amount"] = df.apply(
             lambda row: row["amount"] if row["is_deposit"] else -row["amount"], axis=1
         )
 
         return df
-
-
-
 
     # 3. 그래프 생성
     def _visualize(self, df):
@@ -98,7 +91,9 @@ class Analyzer:
         plt.tight_layout()
 
         # 저장 경로
-        filename = f"analysis/user_{self.user.id}/{self.start_date}_{self.end_date}.jpeg"
+        filename = (
+            f"analysis/user_{self.user.id}/{self.start_date}_{self.end_date}.jpeg"
+        )
         filepath = os.path.join(settings.MEDIA_ROOT, filename)
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
 
@@ -106,18 +101,14 @@ class Analyzer:
         plt.close()
         return filename
 
-
-
-
-
     # 4. 설명문 자동 생성
     def _description(self, df):
-        income = int(df[df["is_deposit"] == True]["amount"].sum())
-        expense = int(df[df["is_deposit"] == False]["amount"].sum())
+        income = int(df[df["is_deposit"]]["amount"].sum())
+        expense = int(df[~df["is_deposit"]]["amount"].sum())
         net = income - expense
 
         top_category = (
-            df[df["is_deposit"] == False]
+            df[~df["is_deposit"]]
             .groupby("category")["amount"]
             .sum()
             .sort_values(ascending=False)
@@ -131,9 +122,6 @@ class Analyzer:
             f"순소비: {net:,}원\n"
             f"최대 지출 카테고리: {top_name}"
         )
-
-
-
 
     # 5. 전체 실행
     def run(self):
