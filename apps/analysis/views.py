@@ -109,7 +109,6 @@ class AnalysisView(generics.ListCreateAPIView):
         start_date = serializer.validated_data['start_date']
         end_date = serializer.validated_data['end_date']
 
-
         # 거래내역 존재 검증
         transactions = self._transaction_check(self.request.user, start_date, end_date)
 
@@ -212,7 +211,6 @@ class AnalysisView(generics.ListCreateAPIView):
                 ha='center',
                 va='bottom',
                 fontsize=10,
-                fontweight="bold"
             )
 
         # 평균선
@@ -252,7 +250,6 @@ class AnalysisView(generics.ListCreateAPIView):
             legend_labels,
             loc='center left',
             fontsize=10,
-            fontweight="bold",
         )
     # 파일명 생성하는 메서드
     def _generate_filename(self, user, start_date, end_date):
