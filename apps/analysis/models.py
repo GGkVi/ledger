@@ -1,8 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from .utils import analysis_image_path
-
 
 # enum용 클래스 선언: 총지출 금액 Enumerate. 총지출이라 Total 붙임
 class Targets(models.TextChoices):
@@ -17,7 +15,6 @@ class Periods(models.TextChoices):
 
 
 class Analysis(models.Model):
-
     # id 비선언 → 자동생성
     # 유저id FK 받아오기
     user = models.ForeignKey(
@@ -59,7 +56,7 @@ class Analysis(models.Model):
     # %Y/%m으로 연도/월/ 디렉터리에 저장될 수 있게
     # upload_to = get_analysis_image_path 식으로 함수에서 받을 수 있게 한다면?
     result_image = models.ImageField(
-        upload_to=analysis_image_path,
+        upload_to='analysis/',
         verbose_name="분석 그래프",
         blank=True,
         null=True,
