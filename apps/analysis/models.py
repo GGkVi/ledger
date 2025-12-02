@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 
+
 # enum용 클래스 선언: 총지출 금액 Enumerate. 총지출이라 Total 붙임
 class Targets(models.TextChoices):
     EXPENSE = "expense", "총 지출"

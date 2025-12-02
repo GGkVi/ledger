@@ -3,18 +3,20 @@
 import django.db.models.deletion
 from django.db import migrations, models
 
+import apps.analysis.utils
+
 
 class Migration(migrations.Migration):
 
     initial = True
 
     dependencies = [
-        ('users', '0001_initial'),
+        ("users", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Analysis',
+            name="Analysis",
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('target', models.CharField(choices=[('expense', '총 지출'), ('income', '총 수입')], db_index=True, max_length=10, verbose_name='분석 대상')),
@@ -28,12 +30,28 @@ class Migration(migrations.Migration):
                 ('user', models.ForeignKey(db_column='user_id', on_delete=django.db.models.deletion.CASCADE, related_name='analyses', to='users.user', verbose_name='사용자')),
             ],
             options={
-                'verbose_name': '가계부 분석',
-                'verbose_name_plural': '가계부 분석 목록',
-                'db_table': 'analysis',
-                'ordering': ['-created_at'],
-                'indexes': [models.Index(fields=['user', 'target', 'period'], name='idx_user_target_period'), models.Index(fields=['period_start', 'period_end'], name='idx_period_range'), models.Index(fields=['-created_at'], name='idx_created_desc')],
-                'constraints': [models.CheckConstraint(condition=models.Q(('period_start__lte', models.F('period_end'))), name='check_period_validity')],
+                "verbose_name": "가계부 분석",
+                "verbose_name_plural": "가계부 분석 목록",
+                "db_table": "analysis",
+                "ordering": ["-created_at"],
+                "indexes": [
+                    models.Index(
+                        fields=["user", "target", "period"],
+                        name="idx_user_target_period",
+                    ),
+                    models.Index(
+                        fields=["period_start", "period_end"], name="idx_period_range"
+                    ),
+                    models.Index(fields=["-created_at"], name="idx_created_desc"),
+                ],
+                "constraints": [
+                    models.CheckConstraint(
+                        condition=models.Q(
+                            ("period_start__lte", models.F("period_end"))
+                        ),
+                        name="check_period_validity",
+                    )
+                ],
             },
         ),
     ]
