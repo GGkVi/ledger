@@ -4,15 +4,30 @@ version = "0.1.0"
 description = ""
 authors = ["ducknam3650 <ducknam3650@gamil.com>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.13"
 django = "^5.0"
 gunicorn = "^22.0.0"
 psycopg2-binary = "^2.9.9"
+python-dotenv = "^1.2.1"
+pre-commit = "^4.5.0"
+djangorestframework = "^3.16.1"
+djangorestframework-simplejwt = "^5.5.1"
+drf-yasg = "^1.21.11"
+pillow = "^12.0.0"
+isort = "^7.0.0"
+ruff = "^0.14.7"
+black = "^25.11.0"
+matplotlib = "^3.10.7"
+pandas = "^2.3.3"
+numpy = "^2.3.5"
+celery = "^5.6.0"
+redis = "^7.1.0"
+django-celery-beat = "^2.8.1"
+django-celery-results = "^2.6.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-
